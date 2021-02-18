@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+
+{% load static %}
+{% block content %}
+    <style type="text/css">
+        #id_chatroom_loading_spinner {
+            position: absolute;
+        }
+
+    </style>
+
+    {% if debug %}
+        PUBLIC CHAT
+    {% endif %}
+    <span class="{% if not debug %}d-none{% endif %} page-number" id="id_page_number">1</span>
+
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex flex-column align-items-center mb-3">
+                        <img class="img-fluid d-block" src="{% static 'livechat/chat_logo_250x250.png' %}"
+                             alt="Paco elChato logo" width="200" height="200"
+                             style="margin-top: -25px; margin-bottom: -25px;">
+                        <h2>
+                            <span style="color: red">Welcome</span>
+                            <span style="color: orange">to</span>
+                            <span style="color: yellowgreen">the</span>
+                            <span style="color: deepskyblue">{{ room_name }}</span>
+                            <span style="color: dodgerblue">chat!</span>
+                        </h2>
+                    </div>
+                    <div class="d-flex flex-column align-items-center" id="id_chat_log_container">
+                        <div class="d-flex flex-row justify-content-center" id="id_chatroom_loading_spinner_container">
+                            <div class="spinner-border text-primary" id="id_chatroom_loading_spinner" role="status"
+                                 style="display: none; ">
+                                <span class="sr-only">Loading...</span>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-column">
+                            <textarea id="chat-log" cols="100" rows="20" readonly></textarea><br>
+                            <div class="d-flex chat-message-input-container">
+                                <input class="flex-grow-1 chat-message-input" id="chat-message-input"/>
+                                <button class="btn btn-primary chat-message-submit-button">
+                                    <span id="chat-message-submit" class="material-icons">send</span>
+                                </button>
+                            </div>
+                        </div>
+                        {{ room_name|json_script:"room-name" }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const roomName = JSON.parse(document.getElementById('room-name').textContent);
+
+        //cream un socket pentru chatul asincron
+        const chatSocket = new WebSocket(
+            'ws://'
+            + window.location.host
+            + '/ws/public_chat/'
+            + roomName
+            + '/'
+        );
+
+        /**
+         * Administram primirea fiecarui mesaj
+         * @param e
+         */
+        chatSocket.onmessage = function (e) {
+            const data = JSON.parse(e.data);
+            document.querySelector('#chat-log').value += (data.message + '\n');
+            //pastram mereu scroll-ul jos de tot
+            var textarea = document.getElementById('chat-log');
+            textarea.scrollTop = textarea.scrollHeight;
+        };
+
+        /**
+         * Administram inchiderea chatului
+         * @param e
+         */
+        chatSocket.onclose = function (e) {
+            console.error('Chat socket closed unexpectedly');
+        };
+
+        document.querySelector('#chat-message-input').focus();
+        /**
+         * Preluam mesajul din obiectul de input
+         * @param e
+         */
+        document.querySelector('#chat-message-input').onkeyup = function (e) {
+            if (e.keyCode === 13) {  // enter, return
+                document.querySelector('#chat-message-submit').click();
+            }
+        };
+
+        /**
+         * Trimitem userul la chatul public ales
+         * @param e
+         */
+        document.querySelector('#chat-message-submit').onclick = function (e) {
+            const messageInputDom = document.querySelector('#chat-message-input');
+            const message = '{{ username }}: ' + messageInputDom.value.replaceAll("cuvantCenzurat", "*".repeat("cuvantCenzurat".length));
+            chatSocket.send(JSON.stringify({
+                'message': message
+            }));
+            messageInputDom.value = '';
+
+        };
+    </script>
+{% endblock content %}

@@ -1,0 +1,127 @@
+{% load static %}
+
+<style type="text/css">
+    .my-grid {
+        border: 1px solid black;
+    }
+
+    .my-grid-item {
+        border: 1px solid black;
+    }
+</style>
+
+<div class="d-flex p-3 px-md-4 mb-4 bg-white border-bottom shadow-sm">
+    <!-- MEDIUM+ screens -->
+    <div class="d-none d-md-flex flex-row my-auto flex-grow-1 align-items-center">
+
+        <img class="img-fluid mx-auto d-block" style="margin-right:200px"
+             src="{% static 'livechat/chat_logo_250x250.png' %}"
+             alt="Paco elChato logo" width="100" height="100">
+
+        <!-- Home -->
+        <h5 class="mr-3 ml-3 font-weight-normal justify-content-start">
+            <a class="p-2 text-dark" href="{% url 'personal:lobby-select' %}">Home</a>
+        </h5>
+
+        <!-- Search -->
+        <form class="search-bar justify-content-start" onsubmit="return executeQuery();">
+            <input type="text" class="form-control" name="q" id="id_q_large" placeholder="Search...">
+        </form>
+
+
+        <div class="d-flex flex-row-reverse flex-grow-1">
+            <nav>
+                {% if request.user.is_authenticated %}
+                    <div class="dropdown dropleft show p-2">
+                        <div class="d-flex flex-row">
+                            <!-- ACCOUNT -->
+                            <div class="btn-group dropleft">
+                                {% if request.user.profile_image %}
+                                    <img class="account-image rounded-circle m-auto d-block dropdown-toggle"
+                                         id="id_profile_links"
+                                         data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                                         src="{{ request.user.profile_image.url }}"
+                                         alt="Paco elChato logo" width="40" height="40">
+                                {% endif %}
+                                <div class="dropdown-menu" aria-labelledby="id_profile_links">
+                                    <a class="dropdown-item" href="{% url 'account:view' user_id=request.user.id %}">Account</a>
+                                    <a class="dropdown-item" href="{% url 'logout' %}">Logout</a>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                {% else %}
+                    <a class="p-2 text-dark" href="{% url 'login' %}">Login</a>
+                    <a class="btn btn-outline-primary" href="{% url 'register' %}">Register</a>
+                {% endif %}
+            </nav>
+        </div>
+    </div>
+
+    <!-- SMALL- screens -->
+    <div class="d-flex d-md-none flex-column flex-grow-1 my-auto align-items-center">
+
+        <!-- Home -->
+        <h5 class="font-weight-normal">
+            <a class="p-2 text-dark" href="{% url 'personal:lobby-select' %}">Home</a>
+        </h5>
+
+        <!-- Search -->
+        <form class="search-bar mb-2" onsubmit="return executeQuery();">
+            <input type="text" class="form-control" name="q" id="id_q_small" placeholder="Search...">
+        </form>
+
+        <div>
+            <img class="img-fluid mx-auto d-block" src="{% static 'livechat/chat_logo_250x250.png' %}"
+                 alt="Paco elChato logo" width="250" height="250">
+        </div>
+        <!-- Account -->
+        <div class="d-flex flex-row-reverse">
+            <nav>
+                {% if request.user.is_authenticated %}
+                    <div class="dropdown dropleft p-2 mt-1">
+                        <div class="d-flex flex-row">
+                            <div class="btn-group dropleft">
+                                {% if request.user.profile_image %}
+                                    <img class="account-image rounded-circle m-auto d-block dropdown-toggle"
+                                         id="id_profile_links"
+                                         data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                                         src="{{ request.user.profile_image.url }}"
+                                         alt="Paco elChato logo" width="40" height="40">
+                                {% else %}
+                                    <img class="account-image rounded-circle m-auto d-block dropdown-toggle"
+                                         id="id_profile_links"
+                                         data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                                         alt="Paco elChato logo" width="40" height="40">
+                                {% endif %}
+                                <div class="dropdown-menu" aria-labelledby="id_profile_links">
+                                    <a class="dropdown-item" href="{% url 'account:view' user_id=request.user.id %}">Account</a>
+                                    <a class="dropdown-item m-2" href="{% url 'logout' %}">Logout</a>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                {% else %}
+                    <a class="p-2 mt-2 text-dark" href="{% url 'login' %}">Login</a>
+                    <a class="btn btn-outline-primary" href="{% url 'register' %}">Register</a>
+                {% endif %}
+            </nav>
+        </div>
+
+
+    </div>
+
+</div>
+
+<script type="text/javascript">
+    function executeQuery() {
+        var query = document.getElementById("id_q_small").value;
+        if (query === "") {
+            query = document.getElementById("id_q_large").value;
+        }
+        window.location.replace("{% url 'search' %}?q=" + query);
+        return false;
+    }
+</script>

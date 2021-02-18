@@ -1,0 +1,33 @@
+<script type="text/javascript">
+    /**
+     * Construim requestul pentru stergerea friend-ului si actiunile care se desfasoara in fiecare caz
+     * @param id cont care primeste requestul
+     * @param uiUpdateFunction functie pentru update-ul ui-ului
+     */
+    function removeFriend(id, uiUpdateFunction) {
+        payload = {
+            "csrfmiddlewaretoken": "{{ csrf_token }}",
+            "receiver_user_id": id,
+        }
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            timeout: 5000,
+            url: "{% url 'friend:remove-friend' %}",
+            data: payload,
+            success: function(data) {
+                if (data.response === "Friend has been removed.") {
+
+                } else if (data.response != null) {
+                    alert(data.response)
+                }
+            },
+            error: function(data) {
+                alert("Something went wrong: " + data)
+            },
+            complete: function(data) {
+                uiUpdateFunction()
+            }
+        })
+    }
+</script>

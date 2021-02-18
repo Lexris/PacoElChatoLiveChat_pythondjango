@@ -1,0 +1,29 @@
+<script type="text/javascript">
+    /**
+     * Construim requestul pentru refuzarea friend-requesutlui si actiunile care se desfasoara in fiecare caz
+     * @param friend_request_id cont care primeste requestul
+     * @param uiUpdateFunction functie pentru update-ul ui-ului
+     */
+    function declineFriendRequest(friend_request_id, uiUpdateFunction) {
+        var url = "{% url 'friend:friend-request-decline' friend_request_id=689123481234898312 %}".replace("689123481234898312", friend_request_id)
+        $.ajax({
+            type: "GET",
+            dataType: "json",
+            url: url,
+            timeout: 5000,
+            success: function(data) {
+                if(data.response === "Friend request declined.") {
+
+                } else if(data.response != null) {
+                    alert(data.response)
+                }
+            },
+            error: function(data) {
+                alert("Something went wrong, please try again later")
+            },
+            complete: function(data) {
+                uiUpdateFunction()
+            },
+        })
+    }
+</script>

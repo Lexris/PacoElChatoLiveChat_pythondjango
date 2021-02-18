@@ -1,0 +1,33 @@
+<script type="application/javascript">
+    /**
+     * Construim requestul pentru trimiterea friendrequest-ului si actiunile care se desfasoara in fiecare caz
+     * @param id cont care primeste requestul
+     * @param uiUpdateFunction functie pentru update-ul ui-ului
+     */
+    function sendFriendRequest(id, uiUpdateFunction) {
+        payload = {
+            "csrfmiddlewaretoken": "{{ csrf_token }}",
+            "receiver_user_id": id,
+        }
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            url: "{% url 'friend:friend-request' %}",
+            timeout: 5000,
+            data: payload,
+            success: function(data) {
+                if(data.response === "Friend request sent.") {
+                    //placeholder
+                } else if(data.response != null) {
+                    alert(data.response)
+                }
+            },
+            error: function(data) {
+                alert(data.response)
+            },
+            complete: function(data) {
+                uiUpdateFunction()
+            }
+        })
+    }
+</script>
